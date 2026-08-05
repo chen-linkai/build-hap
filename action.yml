@@ -26,4 +26,4 @@ runs:
       run: |
         cd ${{ inputs.workspace }}
         "/tmp/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
-        "/tmp/build-hap/command-line-tools/tool/node/bin/node" "./hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
+        "/tmp/build-hap/command-line-tools/tool/node/bin/node" "/tmp/build-hap/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
