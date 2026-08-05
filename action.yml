@@ -7,21 +7,21 @@ branding:
   color: 'blue'
 
 inputs:
-  path:
-    description: '项目路径'
+  workspace:
+    description: '工作目录。'
     required: true
 
 runs:
   using: 'composite'
   steps:
-    - name: 下载
+    - name: 配置工具
       shell: bash
       run: |
         gh release download --repo "${{ github.repository }}" --pattern 'commandline-tools-linux-x64-*.zip' --dir /tmp/build-hap
         cd /tmp/build-hap
         unzip -q commandline-tools-linux-x64-*.zip
 
-    - name: 构建
+    - name: 构建项目
       shell: bash
       run: |
         cd ${{ inputs.path }}
