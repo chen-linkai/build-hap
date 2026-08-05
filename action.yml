@@ -10,6 +10,10 @@ inputs:
   workspace:
     description: '工作目录'
     required: true
+  token:
+    description: 'GitHub 令牌'
+    required: false
+    default: ${{ github.token }}
 
 runs:
   using: 'composite'
@@ -24,6 +28,8 @@ runs:
     - name: 配置工具
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
       run: |
         gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir $RUNNER_TEMP/build-hap
         cd $RUNNER_TEMP/build-hap
