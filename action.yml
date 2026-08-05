@@ -23,6 +23,8 @@ runs:
 
     - name: 构建项目
       shell: bash
+      env:
+        DEVECO_SDK_HOME: /tmp/build-hap/command-line-tools/sdk
       run: |
         cd ${{ inputs.workspace }}
         "/tmp/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
