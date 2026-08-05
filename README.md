@@ -1,6 +1,6 @@
 # Build Hap v1
 
-# 用法
+## 用法
 
 ```yaml
 - uses: CoolCLK/build-hap@v1
