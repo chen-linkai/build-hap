@@ -10,6 +10,10 @@ inputs:
   workspace:
     description: '工作目录'
     required: true
+  version:
+    description: '工具版本'
+    required: false
+    default: '6.1.1.300'
   token:
     description: 'GitHub 令牌'
     required: false
@@ -18,28 +22,60 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: 检查平台
+      shell: bash
+      run: |
+        if [[ "$RUNNER_OS" != "Linux" ]]; then
+          exit 1
+        fi
+
     - name: 恢复缓存
       id: cache
       uses: actions/cache@v5
       with:
-        path: ${{ runner.temp }}/build-hap
-        key: build-hap-command-line-tools-v1
-    
-    - name: 配置工具
+        path: ${{ runner.temp }}/build-hap-cache
+        key: build-hap-commandline-tools-${{ inputs.version }}
+
+    - name: 下载工具
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       env:
+        TOOL_VERSION: ${{ inputs.version }}
         GITHUB_TOKEN: ${{ inputs.token }}
       run: |
-        gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir $RUNNER_TEMP/build-hap
-        cd $RUNNER_TEMP/build-hap
-        unzip -q commandline-tools-linux-x64-*.zip
+        mkdir -p "$RUNNER_TEMP/build-hap-cache"
+        cd "$RUNNER_TEMP/build-hap-cache"
+        gh release download --repo "CoolCLK/build-hap" \
+          --pattern "commandline-tools-linux-x64-$TOOL_VERSION.zip" \
+          --dir . \
+          --clobber
+        if ! ls commandline-tools-linux-x64-*.zip &>/dev/null; then
+          exit 1
+        fi
+
+    - name: 解压工具
+      shell: bash
+      run: |
+        mkdir -p "$RUNNER_TEMP/build-hap"
+        cd "$RUNNER_TEMP/build-hap-cache"
+        zip_file=$(ls commandline-tools-linux-x64-*.zip | head -n1)
+        if [ -z "$zip_file" ]; then
+          exit 1
+        fi
+        unzip -q -o "$zip_file" -d "$RUNNER_TEMP/build-hap"
+
+    - name: 配置项目
+      shell: bash
+      env:
+        DEVECO_SDK_HOME: "${{ runner.temp }}/build-hap/command-line-tools/sdk"
+      run: |
+        cd ${{ inputs.workspace }}
+        "$RUNNER_TEMP/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
 
     - name: 构建项目
       shell: bash
       env:
-        DEVECO_SDK_HOME: ${{ runner.temp }}/build-hap/command-line-tools/sdk
+        DEVECO_SDK_HOME: "${{ runner.temp }}/build-hap/command-line-tools/sdk"
       run: |
         cd ${{ inputs.workspace }}
-        "$RUNNER_TEMP/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
-        "$RUNNER_TEMP/build-hap/command-line-tools/tool/node/bin/node" "$RUNNER_TEMP/build-hap/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
+        "$RUNNER_TEMP/build-hap/command-line-tools/tool/node/bin/node" "$RUNNER_TEMP/build-hap/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --no-daemon
