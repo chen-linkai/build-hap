@@ -1,0 +1,29 @@
+name: 'Build Hap'
+description: '构建 Hap。'
+author: 'clk'
+
+branding:
+  icon: 'box'
+  color: 'blue'
+
+inputs:
+  path:
+    description: '项目路径'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 下载
+      shell: bash
+      run: |
+        gh release download --repo "${{ github.repository }}" --pattern 'commandline-tools-linux-x64-*.zip' --dir /tmp/build-hap
+        cd /tmp/build-hap
+        unzip -q commandline-tools-linux-x64-*.zip
+
+    - name: 构建
+      shell: bash
+      run: |
+        cd ${{ inputs.path }}
+        "/tmp/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
+        "/tmp/build-hap/command-line-tools/tool/node/bin/node" "./hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
