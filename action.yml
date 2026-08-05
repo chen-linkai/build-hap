@@ -17,15 +17,15 @@ runs:
     - name: 配置工具
       shell: bash
       run: |
-        gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir /tmp/build-hap
-        cd /tmp/build-hap
+        gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir $RUNNER_TEMP/build-hap
+        cd $RUNNER_TEMP/build-hap
         unzip -q commandline-tools-linux-x64-*.zip
 
     - name: 构建项目
       shell: bash
       env:
-        DEVECO_SDK_HOME: /tmp/build-hap/command-line-tools/sdk
+        DEVECO_SDK_HOME: ${{ runner.temp }}/build-hap/command-line-tools/sdk
       run: |
         cd ${{ inputs.workspace }}
-        "/tmp/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
-        "/tmp/build-hap/command-line-tools/tool/node/bin/node" "/tmp/build-hap/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
+        "$RUNNER_TEMP/build-hap/command-line-tools/ohpm/bin/ohpm" install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
+        "$RUNNER_TEMP/build-hap/command-line-tools/tool/node/bin/node" "$RUNNER_TEMP/build-hap/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --daemon
