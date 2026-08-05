@@ -14,7 +14,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: 恢复缓存
+      id: cache
+      uses: actions/cache@v5
+      with:
+        path: ${{ runner.temp }}/build-hap
+        key: build-hap-command-line-tools-v1
+    
     - name: 配置工具
+      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir $RUNNER_TEMP/build-hap
