@@ -17,7 +17,7 @@ runs:
     - name: 配置工具
       shell: bash
       run: |
-        gh release download --repo "${{ github.repository }}" --pattern 'commandline-tools-linux-x64-*.zip' --dir /tmp/build-hap
+        gh release download --repo "CoolCLK/build-hap" --pattern 'commandline-tools-linux-x64-*.zip' --dir /tmp/build-hap
         cd /tmp/build-hap
         unzip -q commandline-tools-linux-x64-*.zip
 
