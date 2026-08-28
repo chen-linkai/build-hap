@@ -1,13 +1,14 @@
-# Build Hap v1
+# Build HAP
 
-## 用法
+## Usage
 
 ```yaml
-- uses: CoolCLK/build-hap@v1
+- uses: chen-linkai/build-hap@v2
   with:
-    workspace: ${{ github.workspace }}
+    workspace: ${{ github.workspace }} # Current working directory.
+    version: 'latest' # The target version of the Command Line Tools.
 ```
 
-## 许可证
+## License
 
-本项目中的脚本和文档基于 [MIT 许可证](LICENSE) 发布。
+See [MIT License](LICENSE).
