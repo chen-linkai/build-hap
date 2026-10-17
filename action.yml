@@ -22,14 +22,14 @@ runs:
     - name: Configure project
       shell: bash
       env:
-        DEVECO_SDK_HOME: "$COMMANDLINE_TOOL_DIR/command-line-tools/sdk"
+        DEVECO_SDK_HOME: ${{ env.COMMANDLINE_TOOL_DIR }}/command-line-tools/sdk
       run: |
         cd ${{ inputs.workspace }}
         ohpm install --all --registry https://ohpm.openharmony.cn/ohpm/ --strict_ssl true
     - name: Build project
       shell: bash
       env:
-        DEVECO_SDK_HOME: "$COMMANDLINE_TOOL_DIR/command-line-tools/sdk"
+        DEVECO_SDK_HOME: ${{ env.COMMANDLINE_TOOL_DIR }}/command-line-tools/sdk
       run: |
         cd ${{ inputs.workspace }}
         node "$COMMANDLINE_TOOL_DIR/command-line-tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --analyze=normal --parallel --incremental --no-daemon
